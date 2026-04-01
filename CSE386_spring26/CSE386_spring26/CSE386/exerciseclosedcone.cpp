@@ -25,7 +25,7 @@ FrameBuffer frameBuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
 RayTracer rayTrace(paleGreen);
 IScene scene;
 
-dvec3 cameraPos(8.5, -2, 21);
+dvec3 cameraPos(8.5, 5, 21);
 dvec3 cameraFocus(8.5, 10, 0);
 dvec3 cameraUp = Y_AXIS;
 double cameraFOV = PI_2;
