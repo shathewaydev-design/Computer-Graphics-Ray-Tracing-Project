@@ -216,7 +216,7 @@ istream& operator >> (istream& is, dmat2& M) {
 
 ostream& operator << (ostream& os, const dmat3& M) {
 	const int N = 3;
-	os << "[ ";
+	os << "[ " << endl;
 	for (int row = 0; row < N; row++) {
 		os << dvec3(M[0][row], M[1][row], M[2][row]) << endl;
 	}

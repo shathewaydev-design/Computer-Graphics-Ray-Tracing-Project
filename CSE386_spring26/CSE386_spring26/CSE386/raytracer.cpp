@@ -67,13 +67,26 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 				// and add their illuminate results together (clamp as needed)
 
 				// see if point is in shadow
-				bool inShadow = lights[0]->pointIsInAShadow(theHit.interceptPt, theHit.normal, objs);
+				//bool inShadow = lights[0]->pointIsInAShadow(theHit.interceptPt, theHit.normal, objs);
+				 
+				for (int i = 0; i < lights.size(); i++) {
+					bool inShadow = lights[i]->pointIsInAShadow(theHit.interceptPt, theHit.normal, objs);
+					c += lights[i]->illuminate(theHit.interceptPt, theHit.normal, theHit.material, // WHEN MAKING LOOP, CLAMP C BEFORE COLORING PIXEL
+						camera.getFrame().origin, inShadow);
+					//glm::clamp(c, 0.0, 1.0);
+					//frameBuffer.setColor(x, y, c);
+				}
 
-				c = lights[0]->illuminate(theHit.interceptPt, theHit.normal, theHit.material, // WHEN MAKING LOOP, CLAMP C BEFORE COLORING PIXEL
-					camera.getFrame().origin, inShadow);
-				//color C = theHit.material.diffuse; // basic way to get color
+				glm::clamp(c, 0.0, 1.0);
 				frameBuffer.setColor(x, y, c);
+				//c = lights[0]->illuminate(theHit.interceptPt, theHit.normal, theHit.material, // WHEN MAKING LOOP, CLAMP C BEFORE COLORING PIXEL
+					//camera.getFrame().origin, inShadow);
+				//color C = theHit.material.diffuse; // basic way to get color
+				//frameBuffer.setColor(x, y, c);
 			
+			}
+			else {
+				frameBuffer.setColor(x, y, paleGreen);
 			}
 			
 

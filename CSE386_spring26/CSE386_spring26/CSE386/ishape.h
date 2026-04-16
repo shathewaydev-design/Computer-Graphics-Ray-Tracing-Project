@@ -229,3 +229,12 @@ struct IBowl : public ISphere {
 	virtual void findClosestIntersection(const Ray& ray, HitRecord& hit) const;
 
 };
+
+// be sure to add this somewhere after IConeY (bottomof code is safe)
+// the : indicates what?
+struct IClosedConeY : public IConeY {
+	IClosedConeY(const dvec3& position, double rad, double H);
+	virtual void findClosestIntersection(const Ray& ray, HitRecord& hit) const;
+protected:
+	IDisk cap;
+};

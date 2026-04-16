@@ -25,7 +25,7 @@ FrameBuffer frameBuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
 RayTracer rayTrace(paleGreen);
 IScene scene;
 
-dvec3 cameraPos(8.5, 5, 21);
+dvec3 cameraPos(8.5, -2, 21);
 dvec3 cameraFocus(8.5, 10, 0);
 dvec3 cameraUp = Y_AXIS;
 double cameraFOV = PI_2;
@@ -33,18 +33,18 @@ double cameraFOV = PI_2;
 void buildScene() {
 	// After you implement the needed code, you can
 	// change these to IClosedConeY:
-	IShape* coneY = new IConeY(dvec3(0.0, 12.0, 0.0), 5.0, 6.0);
-	IShape* coneY2 = new IConeY(dvec3(17.0, 12.0, 0.0), 5.0, 6.0);
+	IShape* coneY = new IClosedConeY(dvec3(0.0, 12.0, 0.0), 5.0, 6.0);
+	IShape* coneY2 = new IClosedConeY(dvec3(17.0, 12.0, 0.0), 5.0, 6.0);
 
 	// sample bowl:
 	IShape* bowl = new IBowl(dvec3(0, 0, 0), 5);
 
-	//scene.addOpaqueObject(new VisibleIShape(coneY, redPlastic));
-	//scene.addOpaqueObject(new VisibleIShape(coneY2, greenPlastic));
-	scene.addOpaqueObject(new VisibleIShape(bowl, greenPlastic));
+	scene.addOpaqueObject(new VisibleIShape(coneY, redPlastic));
+	scene.addOpaqueObject(new VisibleIShape(coneY2, greenPlastic));
+	//scene.addOpaqueObject(new VisibleIShape(bowl, greenPlastic));
 
-	scene.addLight(new PositionalLight(dvec3(20, 0, 0), white)); // changed x to 20 from -3
-	scene.addLight(new PositionalLight(dvec3(20, 0, 0), white));
+	scene.addLight(new PositionalLight(dvec3(20, 0, 0), white)); // changed x to 20 from -3 20 0 0
+	scene.addLight(new PositionalLight(dvec3(20, 5, 0), white)); // changed FROM 20 0 0
 	scene.addLight(new PositionalLight(dvec3(0, 50, 0), white));
 	scene.addLight(new PositionalLight(ORIGIN3D, white));
 }

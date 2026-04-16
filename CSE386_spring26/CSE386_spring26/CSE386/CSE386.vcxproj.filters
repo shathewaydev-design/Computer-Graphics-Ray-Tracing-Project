@@ -140,7 +140,7 @@
     <ClCompile Include="colortests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="exerciseclosedcone.cpp">
+    <ClCompile Include="finalraytrace.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

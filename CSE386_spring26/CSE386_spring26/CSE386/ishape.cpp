@@ -42,7 +42,8 @@ void IShape::getTexCoords(const dvec3& pt, double& u, double& v) const {
 
 dvec3 IShape::movePointOffSurface(const dvec3& pt, const dvec3& n) {
 	/* CSE 386 - todo  */
-	return pt;
+	dvec3 liftNum = EPSILON * glm::normalize(n);
+	return pt + liftNum;
 }
 
 /**
@@ -900,3 +901,33 @@ void IBowl::findClosestIntersection(const Ray& ray, HitRecord& hit) const
 	//	hit.t = FLT_MAX;
 	//}
 }
+
+// Defines a constructor by calling the constructors
+// of the parent and the cap. Notice how these calls are different
+// because IClosedConeY IS AN IConeY,
+// but IClosedConeY HAS A cap (which is an IDisk)
+IClosedConeY::IClosedConeY(const dvec3& position, double rad, double H)
+	: IConeY(position, rad, H),
+	cap(dvec3(position.x, position.y - H, position.z), -Y_AXIS, rad) {
+} // fill in blank with cap's center and normal
+
+void IClosedConeY::findClosestIntersection(const Ray& ray, HitRecord& hit) const {
+	HitRecord coneHit;
+	HitRecord capHit;
+	// Now call findClosestIntersection() for the cone's parent class
+   // and call findClosestIntersection() for the cap.
+	IConeY::findClosestIntersection(ray, coneHit);
+	cap.findClosestIntersection(ray, capHit);
+   // cone hit and cap hit Use the two hit records to figure out which part was hit, if any,
+   // if any, should be rendered.
+
+	if (capHit.t > coneHit.t) {
+		hit = coneHit;
+	}
+	else {
+		hit = capHit;
+	}
+
+}
+
+
