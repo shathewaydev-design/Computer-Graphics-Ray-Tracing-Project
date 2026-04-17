@@ -80,7 +80,7 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 				//	//frameBuffer.setColor(x, y, c);
 				//}
 
-				c += traceIndividualRay(ray, theScene, 2);
+				c += traceIndividualRay(ray, theScene, 3);
 
 				c = glm::clamp(c, 0.0, 1.0);
 				frameBuffer.setColor(x, y, c);

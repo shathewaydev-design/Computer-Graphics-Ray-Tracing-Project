@@ -57,8 +57,8 @@ dvec3 cameraUp = Y_AXIS;
 // Feel free to add more lights if you want, as long as they do not interfere
 // with your being able to show that these two lights are working correctly.
 vector<PositionalLightPtr> lights = {
-						new PositionalLight(dvec3(15, 15, 15), white),
-						new SpotLight(dvec3(-15, 5, 10),
+						new PositionalLight(dvec3(0, 15, 0), white), 
+						new SpotLight(dvec3(15, 15, 5),
 										dvec3(spotDirX,spotDirY,spotDirZ),
 										glm::radians(90.0),
 										white)
@@ -98,7 +98,7 @@ void buildScene() {
 	scene.addLight(lights[0]);
 	scene.addLight(lights[1]);
 	// spotlight is initially off, but feel free to make it initially on if you prefer
-	lights[1]->isOn = false;
+	lights[1]->isOn = true;
 }
 
 void render(GLFWwindow* window) {
