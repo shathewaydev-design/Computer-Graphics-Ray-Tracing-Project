@@ -69,18 +69,22 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 				// see if point is in shadow
 				//bool inShadow = lights[0]->pointIsInAShadow(theHit.interceptPt, theHit.normal, objs);
 				 
-				for (int i = 0; i < lights.size(); i++) {
-					bool inShadow = lights[i]->pointIsInAShadow(theHit.interceptPt, theHit.normal, objs);
-					c += lights[i]->illuminate(theHit.interceptPt, theHit.normal, theHit.material, // WHEN MAKING LOOP, CLAMP C BEFORE COLORING PIXEL
-						camera.getFrame().origin, inShadow);
-					//glm::clamp(c, 0.0, 1.0);
-					//frameBuffer.setColor(x, y, c);
-				}
 
-				glm::clamp(c, 0.0, 1.0);
+
+				// NOW CALLED IN HELPER METHOD!!!
+				//for (int i = 0; i < lights.size(); i++) {
+				//	bool inShadow = lights[i]->pointIsInAShadow(theHit.interceptPt, theHit.normal, objs);
+				//	c += lights[i]->illuminate(theHit.interceptPt, theHit.normal, theHit.material, // WHEN MAKING LOOP, CLAMP C BEFORE COLORING PIXEL
+				//		camera.getFrame().origin, inShadow);
+				//	//glm::clamp(c, 0.0, 1.0);
+				//	//frameBuffer.setColor(x, y, c);
+				//}
+
+				c += traceIndividualRay(ray, theScene, 2);
+
+				c = glm::clamp(c, 0.0, 1.0);
 				frameBuffer.setColor(x, y, c);
-				//c = lights[0]->illuminate(theHit.interceptPt, theHit.normal, theHit.material, // WHEN MAKING LOOP, CLAMP C BEFORE COLORING PIXEL
-					//camera.getFrame().origin, inShadow);
+
 				//color C = theHit.material.diffuse; // basic way to get color
 				//frameBuffer.setColor(x, y, c);
 			
@@ -110,5 +114,51 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 color RayTracer::traceIndividualRay(const Ray& ray, const IScene& theScene, int recursionLevel) const {
 	/* CSE 386 - todo  */
 	// This might be a useful helper function.
-	return black;
+
+	if (recursionLevel <= 0) {
+		return color(0, 0, 0);
+	}
+
+	OpaqueHitRecord closestHit;
+	closestHit.t = FLT_MAX;
+
+	for (VisibleIShape* object : theScene.opaqueObjs) {
+		OpaqueHitRecord tempHit;
+		object->findClosestIntersection(ray, tempHit);
+		
+		if (tempHit.t < closestHit.t) {
+			closestHit = tempHit;
+
+		}
+
+	}
+
+	if (closestHit.t == FLT_MAX) {
+		return color(0, 0, 0);
+	}
+
+
+	color c = black;
+	
+	// loop through all lights, 
+    // adding each lights effect (color) to the point's color
+	for (int i = 0; i < theScene.lights.size(); i++) { 
+
+		bool inShadow = theScene.lights[i]-> // is point in a shadow?
+			pointIsInAShadow(closestHit.interceptPt, closestHit.normal, theScene.opaqueObjs);
+
+		c += theScene.lights[i]->illuminate(closestHit.interceptPt, closestHit.normal, // add the light's effect to the color
+			closestHit.material, theScene.camera->getFrame().origin, inShadow); 
+		
+	}
+
+	dvec3 n = glm::normalize(closestHit.normal);
+
+	dvec3 reflectDir = ray.dir - 2 * glm::dot(ray.dir, n) * n;
+
+	dvec3 origin = IShape::movePointOffSurface(closestHit.interceptPt, closestHit.normal);
+
+	Ray nextRay(origin, reflectDir);
+
+	return c + 0.2 * traceIndividualRay(nextRay, theScene, recursionLevel - 1);
 }
