@@ -182,3 +182,18 @@ EShapeData EShape::createEObj(const string& filename) {
 
 	return result;
 }
+
+EShapeData EShape::createESquare(const Material& mat)
+{
+
+	EShapeData result;
+
+	dvec4 A(-0.5, 0.5, 0, 1);
+	dvec4 B(-0.5, -0.5, 0, 1);
+	dvec4 C(0.5, -0.5, 0, 1);
+	dvec4 D(0.5, 0.5, 0, 1);
+
+	VertexData::addTriVertsAndComputeNormal(result, A, B, C, mat);
+	VertexData::addTriVertsAndComputeNormal(result, A, C, D, mat);
+	return result;
+}

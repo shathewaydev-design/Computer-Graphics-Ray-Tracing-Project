@@ -82,6 +82,8 @@ IPlane* clearPlane = new IPlane(dvec3(0.0, 0.0, MINZ), dvec3(0.0, 0.0, 1.0));
 ISphere* sphere1 = new ISphere(dvec3(0.0, 0.0, 0.0), 4.0);
 IEllipsoid* ellipsoid = new IEllipsoid(dvec3(4, 0, 5), dvec3(1, 1, 2.5));
 ICylinderY* cylinderY = new ICylinderY(dvec3(8.0, 3.0, -2.0), 1.5, 3.0);
+IClosedCylinderZ* cylinderZ = new IClosedCylinderZ(dvec3(5, 4, -2), 2.0, 3.0);
+IClosedConeY* closedConey = new IClosedConeY(dvec3(5, 6, -3), 1.5, 3);
 IDisk* disk = new IDisk(dvec3(-8, 0, 10), dvec3(1, 0, 0), 3);
 
 void buildScene() {
@@ -93,6 +95,9 @@ void buildScene() {
 	scene.addOpaqueObject(new VisibleIShape(ellipsoid, copper));
 
 	scene.addOpaqueObject(new VisibleIShape(cylinderY, gold, &im1));
+	scene.addOpaqueObject(new VisibleIShape(closedConey, polishedBronze));
+	scene.addOpaqueObject(new VisibleIShape(cylinderZ, cyanPlastic));
+
 	scene.addOpaqueObject(new VisibleIShape(disk, redPlastic));
 
 	scene.addLight(lights[0]);

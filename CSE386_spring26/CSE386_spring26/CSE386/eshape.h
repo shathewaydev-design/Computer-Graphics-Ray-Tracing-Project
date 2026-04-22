@@ -33,4 +33,5 @@ struct EShape {
 	static EShapeData createECone(const Material& mat, int slices = DEFAULT_SLICES);
 	static EShapeData createECheckerBoard(const Material& mat1, const Material& mat2, double WIDTH, double HEIGHT, int DIV);
 	static EShapeData createEObj(const string& filename);
+	static EShapeData createESquare(const Material& mat);
 };

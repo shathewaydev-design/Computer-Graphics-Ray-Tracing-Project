@@ -930,4 +930,133 @@ void IClosedConeY::findClosestIntersection(const Ray& ray, HitRecord& hit) const
 
 }
 
+IClosedCylinderY::IClosedCylinderY(const dvec3& position, double R, double len)
+	: ICylinderY(position, R, len),
+	capBottom(dvec3(position.x, position.y - (len / 2), position.z), -Y_AXIS, R),
+	capTop(dvec3(position.x, position.y + (len / 2), position.z), Y_AXIS, R)
+{
 
+}
+
+void IClosedCylinderY::findClosestIntersection(const Ray& ray, HitRecord& hit) const
+{
+	HitRecord cylHit;
+	HitRecord capBottomHit;
+	HitRecord capTopHit;
+
+	ICylinderY::findClosestIntersection(ray, cylHit);
+	capBottom.findClosestIntersection(ray, capBottomHit);
+	capTop.findClosestIntersection(ray, capTopHit);
+
+	// cylinder hit and cap hit Use the three hit records to figure out which part was hit, if any,
+   // if any, should be rendered.
+
+	if (capBottomHit.t < capTopHit.t) {
+		if (capBottomHit.t > cylHit.t) {
+			hit = cylHit;
+			return;
+		}
+		hit = capBottomHit;
+	}
+	else {
+		if (capTopHit.t < cylHit.t) {
+			hit = capTopHit;
+			return;
+		}
+
+		hit = cylHit;
+
+	}
+
+
+}
+
+
+ICylinderZ::ICylinderZ(const dvec3& pos, double rad, double len)
+	: ICylinder(pos, rad, len, QuadricParameters::cylinderZQParams(rad))
+{
+
+}
+
+void ICylinderZ::findClosestIntersection(const Ray& ray, HitRecord& hit) const
+{
+	HitRecord hits[2];
+	int numHits = IQuadricSurface::findIntersections(ray, hits);
+
+	double zMin = center.z - (length / 2);
+	double zMax = center.z + (length / 2);
+
+	if (numHits == 0) {
+		hit.t = FLT_MAX;
+	}
+	else if (numHits == 1) {
+		if (hits[0].interceptPt.z <= zMax && hits[0].interceptPt.z >= zMin) {
+			hit = hits[0];
+
+		}
+		else {
+			hit.t = FLT_MAX;
+		}
+
+	}
+	else if (numHits == 2) {
+		if (hits[0].interceptPt.z <= zMax && hits[0].interceptPt.z >= zMin) {
+			hit = hits[0];
+
+		}
+		else {
+			if (hits[1].interceptPt.z <= zMax && hits[1].interceptPt.z >= zMin) {
+				hit = hits[1];
+			}
+			else {
+				hit.t = FLT_MAX;
+			}
+		}
+	}
+
+}
+
+void ICylinderZ::getTexCoords(const dvec3& pt, double& u, double& v) const
+{
+	/* CSE 386 - todo  */
+	u = v = 0.0;
+}
+
+IClosedCylinderZ::IClosedCylinderZ(const dvec3& position, double R, double len)
+	: ICylinderZ(position, R, len),
+	capBottom(dvec3(position.x, position.y, position.z - (len / 2)), -Z_AXIS, R),
+	capTop(dvec3(position.x, position.y, position.z + (len / 2)), Z_AXIS, R)
+{
+
+}
+
+void IClosedCylinderZ::findClosestIntersection(const Ray& ray, HitRecord& hit) const
+{
+	HitRecord cylHit;
+	HitRecord capBottomHit;
+	HitRecord capTopHit;
+
+	ICylinderZ::findClosestIntersection(ray, cylHit);
+	capBottom.findClosestIntersection(ray, capBottomHit);
+	capTop.findClosestIntersection(ray, capTopHit);
+
+	// cylinder hit and cap hit Use the three hit records to figure out which part was hit, if any,
+   // if any, should be rendered.
+
+	if (capBottomHit.t < capTopHit.t) {
+		if (capBottomHit.t > cylHit.t) {
+			hit = cylHit;
+			return;
+		}
+		hit = capBottomHit;
+	}
+	else {
+		if (capTopHit.t < cylHit.t) {
+			hit = capTopHit;
+			return;
+		}
+
+		hit = cylHit;
+
+	}
+}

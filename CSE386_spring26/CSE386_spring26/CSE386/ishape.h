@@ -238,3 +238,36 @@ struct IClosedConeY : public IConeY {
 protected:
 	IDisk cap;
 };
+
+
+// be sure to add this somewhere after IConeY (bottomof code is safe)
+// the : indicates what?
+struct IClosedCylinderY : public ICylinderY {
+	IClosedCylinderY(const dvec3& position, double R, double len);
+	virtual void findClosestIntersection(const Ray& ray, HitRecord& hit) const;
+protected:
+	IDisk capBottom;
+	IDisk capTop;
+};
+
+
+struct ICylinderZ : public ICylinder {
+	//ICylinderZ();
+	ICylinderZ(const dvec3& position, double R, double len);
+	virtual void findClosestIntersection(const Ray& ray, HitRecord& hit) const;
+	void getTexCoords(const dvec3& pt, double& u, double& v) const;
+};
+
+
+
+struct IClosedCylinderZ : public ICylinderZ {
+	IClosedCylinderZ(const dvec3& position, double R, double len);
+	virtual void findClosestIntersection(const Ray& ray, HitRecord& hit) const;
+protected:
+	IDisk capBottom;
+	IDisk capTop;
+};
+
+
+
+
