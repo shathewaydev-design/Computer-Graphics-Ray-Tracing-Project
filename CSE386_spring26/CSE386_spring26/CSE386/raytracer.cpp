@@ -34,6 +34,8 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 	const vector<VisibleIShapePtr>& objs = theScene.opaqueObjs;
 	const vector<LightSourcePtr>& lights = theScene.lights;
 	color defaultColor = frameBuffer.getClearColor();
+	int N = 1;     // NxN anti-aliasing. Normal approach when N = 1
+
 
 	// this is THE ratracing algorithm
 	// loops through each pixel because this is an IMAGE-ORDER algorithm
@@ -43,20 +45,62 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 			if (DEBUG_PIXEL) {
 				cout << "";
 			}
+
+			color sum = black;
+			// Sum all rays from NxN grid (requires another nested loop)
+			// Display sum/N2
+
+			for (int j = 0; j < N; j++) {
+				for (int i = 0; i < N; i++) {
+
+					double offsetX = (i + 0.5) / N;
+					double offsetY = (j + 0.5) / N;
+					Ray ray = camera.getRay(x + offsetX, y + offsetY);
+
+					OpaqueHitRecord theHit;
+					VisibleIShape::findIntersection(ray, objs, theHit);
+
+					if (theHit.t < FLT_MAX) {
+						color c = black;
+
+						c += traceIndividualRay(ray, theScene, 3);
+
+						c = glm::clamp(c, 0.0, 1.0);
+
+						sum += c;
+
+					}
+					else {
+						sum += paleGreen;
+					}
+
+					
+				}
+
+			}
+
+			color finalColor = sum / (double)(N * N);
+			finalColor = glm::clamp(finalColor, 0.0, 1.0);
+
+			frameBuffer.setColor(x, y, finalColor);
+
+			Ray centerRay = camera.getRay(x + 0.5, y + 0.5);
+			frameBuffer.showAxes(x, y, centerRay, 0.25); // Displays R/x, G/y, B/z axes
+
 			/* CSE 386 - todo  */
 			// for each pixel, generate the ray for that pixel
 			// loop through all objects to see their t-value for that
 			// ray. The shape with the lowest t-value determines the color of the pixel.
 
-			Ray ray = camera.getRay(x, y);
-			OpaqueHitRecord theHit;
-			VisibleIShape::findIntersection(ray, objs, theHit);
+			//Ray ray = camera.getRay(x, y);
+			//OpaqueHitRecord theHit;
+			//VisibleIShape::findIntersection(ray, objs, theHit);
 
 			
 
 			// theHit is set to the t-value of the shape that was closest
-			if (theHit.t < FLT_MAX) {
-				color c = black;
+			//if (theHit.t < FLT_MAX) {
+				//color c = black;
 
 
 				// use 1 light's illuminate() function to set
@@ -80,21 +124,23 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 				//	//frameBuffer.setColor(x, y, c);
 				//}
 
-				c += traceIndividualRay(ray, theScene, 3);
+				//c += traceIndividualRay(ray, theScene, 3);
 
-				c = glm::clamp(c, 0.0, 1.0);
-				frameBuffer.setColor(x, y, c);
+				//c = glm::clamp(c, 0.0, 1.0);
+				//frameBuffer.setColor(x, y, sum);
 
 				//color C = theHit.material.diffuse; // basic way to get color
 				//frameBuffer.setColor(x, y, c);
 			
-			}
-			else {
-				frameBuffer.setColor(x, y, paleGreen);
-			}
+			//}
+
+				//frameBuffer.setColor(x, y, sum);
+			//else {
+			//	frameBuffer.setColor(x, y, paleGreen);
+			//}
 			
 
-			frameBuffer.showAxes(x, y, ray, 0.25);			// Displays R/x, G/y, B/z axes
+			//frameBuffer.showAxes(x, y, ray, 0.25);			// Displays R/x, G/y, B/z axes
 			
 		}
 	}
