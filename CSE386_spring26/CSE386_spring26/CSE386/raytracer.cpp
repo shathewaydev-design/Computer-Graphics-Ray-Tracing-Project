@@ -9,6 +9,7 @@
 #include "raytracer.h"
 #include "ishape.h"
 #include "io.h"
+//#include "finalraytrace.cpp"
 
  /**
   * @fn	RayTracer::RayTracer(const color &defa)
@@ -28,13 +29,14 @@ RayTracer::RayTracer(const color& defa)
  * @param 		  	theScene   	The scene.
  */
 
-void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
+void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth, int aa,
 	const IScene& theScene) const {
 	const RaytracingCamera& camera = *theScene.camera;
 	const vector<VisibleIShapePtr>& objs = theScene.opaqueObjs;
 	const vector<LightSourcePtr>& lights = theScene.lights;
 	color defaultColor = frameBuffer.getClearColor();
-	int N = 1;     // NxN anti-aliasing. Normal approach when N = 1
+	int N = aa;     // NxN anti-aliasing. Normal approach when N = 1
+	int reflectionNum = depth + 1;
 
 
 	// this is THE ratracing algorithm
@@ -63,7 +65,7 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 					if (theHit.t < FLT_MAX) {
 						color c = black;
 
-						c += traceIndividualRay(ray, theScene, 3);
+						c += traceIndividualRay(ray, theScene, reflectionNum);
 
 						c = glm::clamp(c, 0.0, 1.0);
 
@@ -185,6 +187,7 @@ color RayTracer::traceIndividualRay(const Ray& ray, const IScene& theScene, int 
 
 
 	color c = black;
+
 	
 	// loop through all lights, 
     // adding each lights effect (color) to the point's color
@@ -193,10 +196,12 @@ color RayTracer::traceIndividualRay(const Ray& ray, const IScene& theScene, int 
 		bool inShadow = theScene.lights[i]-> // is point in a shadow?
 			pointIsInAShadow(closestHit.interceptPt, closestHit.normal, theScene.opaqueObjs);
 
+
 		c += theScene.lights[i]->illuminate(closestHit.interceptPt, closestHit.normal, // add the light's effect to the color
-			closestHit.material, theScene.camera->getFrame().origin, inShadow); 
+			closestHit.material, theScene.camera->getFrame().origin, inShadow);
 		
 	}
+
 
 	dvec3 n = glm::normalize(closestHit.normal);
 
@@ -206,5 +211,18 @@ color RayTracer::traceIndividualRay(const Ray& ray, const IScene& theScene, int 
 
 	Ray nextRay(origin, reflectDir);
 
-	return c + 0.2 * traceIndividualRay(nextRay, theScene, recursionLevel - 1);
+	// if texture exists
+	if (closestHit.texture != nullptr) {
+
+		color texColor = closestHit.texture->getPixelUV(
+			closestHit.u,
+			closestHit.v
+		);
+
+		color finalColor = 0.5 * c + 0.5 * texColor;
+		return finalColor + 0.3 * traceIndividualRay(nextRay, theScene, recursionLevel - 1);
+	}
+
+
+	return c + 0.3 * traceIndividualRay(nextRay, theScene, recursionLevel - 1);
 }

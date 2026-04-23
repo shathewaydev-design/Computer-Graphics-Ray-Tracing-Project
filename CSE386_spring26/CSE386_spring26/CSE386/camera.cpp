@@ -98,8 +98,8 @@ OrthographicCamera::OrthographicCamera(const dvec3& pos, const dvec3& lookAtPt, 
 
 dvec2 RaytracingCamera::getProjectionPlaneCoordinates(double x, double y) const {
 	dvec2 s;
-	s.x = map(x + 0.5, 0, nx, left, right);
-	s.y = map(y + 0.5, 0, ny, bottom, top);
+	s.x = map(x, 0, nx, left, right);
+	s.y = map(y, 0, ny, bottom, top);
 	return s;
 }
 

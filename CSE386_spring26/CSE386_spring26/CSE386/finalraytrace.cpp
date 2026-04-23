@@ -45,9 +45,9 @@ double spotDirY = -1;
 double spotDirZ = 0;
 
 // initial camera location and focus. Change as needed
-double camX = 5;
-double camY = 5;
-double camZ = 5;
+double camX = 6;
+double camY = 7;
+double camZ = 6;
 double cameraFOV = 120.0;
 dvec3 cameraFocus = dvec3(0.0, 0.0, 0.0);
 
@@ -82,9 +82,9 @@ IPlane* clearPlane = new IPlane(dvec3(0.0, 0.0, MINZ), dvec3(0.0, 0.0, 1.0));
 ISphere* sphere1 = new ISphere(dvec3(0.0, 0.0, 0.0), 4.0);
 IEllipsoid* ellipsoid = new IEllipsoid(dvec3(4, 0, 5), dvec3(1, 1, 2.5));
 ICylinderY* cylinderY = new ICylinderY(dvec3(8.0, 3.0, -2.0), 1.5, 3.0);
-IClosedCylinderZ* cylinderZ = new IClosedCylinderZ(dvec3(5, 4, -2), 2.0, 3.0);
+IClosedCylinderZ* cylinderZ = new IClosedCylinderZ(dvec3(8.0, 0, 1), 2.0, 3.0);
 IClosedConeY* closedConey = new IClosedConeY(dvec3(5, 6, -3), 1.5, 3);
-IDisk* disk = new IDisk(dvec3(-8, 0, 10), dvec3(1, 0, 0), 3);
+IDisk* disk = new IDisk(dvec3(-8, 0, 10), dvec3(0, 0, 1), 3);
 
 void buildScene() {
 	// Choose materials and colors and textures and opacity as needed
@@ -98,12 +98,14 @@ void buildScene() {
 	scene.addOpaqueObject(new VisibleIShape(closedConey, polishedBronze));
 	scene.addOpaqueObject(new VisibleIShape(cylinderZ, cyanPlastic));
 
-	scene.addOpaqueObject(new VisibleIShape(disk, redPlastic));
+	scene.addOpaqueObject(new VisibleIShape(disk, redPlastic, &im1));
 
 	scene.addLight(lights[0]);
 	scene.addLight(lights[1]);
 	// spotlight is initially off, but feel free to make it initially on if you prefer
 	lights[1]->isOn = true;
+	posLight->atParams = LightATParams(1.0, 0.0004, 0.0006);
+	spotLight->atParams = LightATParams(1.0, 0.005, 0.003);
 }
 
 void render(GLFWwindow* window) {
@@ -137,7 +139,7 @@ void render(GLFWwindow* window) {
 	int top = frameBuffer.getWindowHeight() - 1;
 	double N = 6.0;
 	scene.camera = new PerspectiveCamera(dvec3(camX, camY, camZ), cameraFocus, cameraUp, glm::radians(cameraFOV), width, height);
-	rayTrace.raytraceScene(frameBuffer, numReflections, scene);
+	rayTrace.raytraceScene(frameBuffer, numReflections, antiAliasing, scene);
 
 	frameBuffer.showColorBuffer();
 	milliseconds frameEndTime = duration_cast<milliseconds>(

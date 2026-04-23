@@ -74,6 +74,13 @@ void VisibleIShape::findClosestIntersection(const Ray& ray, OpaqueHitRecord& hit
 	if (hit.t < FLT_MAX) { // there was a hit
 		hit.material = material;
 		hit.texture = texture;
+
+		// If we have a texture, use it
+		if (hit.texture != nullptr) {
+			shape->getTexCoords(hit.interceptPt, hit.u, hit.v);
+		}
+
+
 	}
 
 }
@@ -217,7 +224,7 @@ void IDisk::getTexCoords(const dvec3& pt, double& u, double& v) const {
 	// The following works only for disks oriented with a normal vector = <0, 0, 1>
 	u = map(pt.x, center.x - radius, center.x + radius, 0.0, 1.0);
 	v = map(pt.y, center.y - radius, center.y + radius, 0.0, 1.0);
-	v = 1.0 - v;
+	// v = 1.0 - v;
 }
 
 /**
@@ -855,7 +862,17 @@ void ICylinderY::findClosestIntersection(const Ray& ray, HitRecord& hit) const {
 
 void ICylinderY::getTexCoords(const dvec3& pt, double& u, double& v) const {
 	/* CSE 386 - todo  */
-	u = v = 0.0;
+	//u = v = 0.0;
+
+	double theta = atan2(pt.z, pt.x);
+
+	u = (theta + PI) / (2 * PI);
+
+	//u = 0.0;
+	v = map(pt.y, center.y - length / 2, center.y + length / 2, 0, 1);
+
+
+
 }
 
 /**

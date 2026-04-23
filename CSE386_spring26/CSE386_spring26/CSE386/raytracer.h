@@ -22,6 +22,7 @@
 struct RayTracer {
 	color defaultColor;			//!< the color to use if no intersection is present.
 	RayTracer(const color& defaultColor);
+	void raytraceScene(FrameBuffer& frameBuffer, int depth, int aa, const IScene& theScene) const;
 	void raytraceScene(FrameBuffer& frameBuffer, int depth,
 		const IScene& theScene) const;
 protected:

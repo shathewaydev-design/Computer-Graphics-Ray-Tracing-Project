@@ -114,6 +114,7 @@ Image::Image(std::string ppmFileName) : W(0), H(0) {
 
 color Image::getPixelUV(double u, double v) const {
 	int x = glm::clamp((int)(W * u), 0, W - 1);
-	int y = glm::clamp((int)(H * v), 0, H - 1);
+	//modified 
+	int y = glm::clamp((int)(H - H * v), 0, H - 1);
 	return pixels[y * W + x];
 }
